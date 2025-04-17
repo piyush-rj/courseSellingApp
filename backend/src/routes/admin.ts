@@ -112,6 +112,7 @@ adminRouter.put("/course", adminMiddleware, async (req: Request, res: Response) 
     
     const { title, description, imageUrl, price } = req.body;
 
+    const course = await courseModel.findOne
     
 })
 

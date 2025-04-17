@@ -12,26 +12,28 @@ declare module "express-serve-static-core" {
 }
 
 async function adminMiddleware(req: Request, res: Response, next: NextFunction) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(403).json({ msg: "No token provided" });
-  }
-
-  const token = authHeader.replace("Bearer ", "");
-
-  try {
-    const decoded = jwt.verify(token, SECRET) as JwtPayload;
-
-    if (!decoded || typeof decoded !== "object" || !decoded.adminId) {
-      return res.status(403).json({ msg: "Invalid token" });
+    const authHeader = req.headers.authorization;
+  
+    if (!authHeader) {
+      res.status(403).json({ msg: "No token provided" });
+      return;
     }
-
-    req.adminId = decoded.adminId;
-    next();
-  } catch (err) {
-    return res.status(403).json({ msg: "Authentication failed" });
+  
+    const token = authHeader.replace("Bearer ", "");
+  
+    try {
+      const decoded = jwt.verify(token, SECRET) as JwtPayload;
+  
+      if (!decoded || typeof decoded !== "object" || !decoded.adminId) {
+        res.status(403).json({ msg: "Invalid token" });
+        return;
+      }
+  
+      req.adminId = decoded.adminId;
+      next();
+    } catch (err) {
+      res.status(403).json({ msg: "Authentication failed" });
+    }
   }
-}
-
+  
 export { adminMiddleware };

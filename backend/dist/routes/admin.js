@@ -18,6 +18,8 @@ const adminSchema_1 = require("../schema/adminSchema");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const adminMiddleware_1 = require("../middlewares/adminMiddleware");
+const courseSchema_1 = require("../schema/courseSchema");
 dotenv_1.default.config();
 const SECRET = process.env.JWT_SECRET;
 const adminRouter = (0, express_1.Router)();
@@ -81,15 +83,29 @@ adminRouter.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, func
     }
     // const hashedPassword = bcrypt.hash(existingUser.password, 10)
 }));
-adminRouter.post("/course", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.json({
-        msg: "admin signin"
-    });
+adminRouter.post("/course", adminMiddleware_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const adminId = req.adminId;
+        const { title, description, imageUrl, price } = req.body;
+        const course = yield courseSchema_1.courseModel.create({
+            title,
+            description,
+            imageUrl,
+            price,
+            creatorId: adminId
+        });
+        res.json({
+            msg: "Course created",
+            courseId: course._id
+        });
+    }
+    catch (error) {
+        console.log("course creation failed");
+    }
 }));
-adminRouter.put("/course", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.json({
-        msg: "admin signin"
-    });
+adminRouter.put("/course", adminMiddleware_1.adminMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { title, description, imageUrl, price } = req.body;
+    const course = yield courseSchema_1.courseModel.findOne;
 }));
 adminRouter.get("/courses/bulk", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.json({
